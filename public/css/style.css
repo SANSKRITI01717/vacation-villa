@@ -1,0 +1,122 @@
+body{
+    margin: 0;
+   display: flex;
+   flex-direction: column;
+   min-height: 100vh;
+}
+.container{
+    flex: 1;
+}
+.heading{
+    text-align: center;
+}
+.add-btn{
+   
+     background-color: rgb(43, 87, 0) !important;
+     border: none !important;
+}
+
+.navbar{
+    height: 5rem;
+    background-color: white;
+}
+.fa-globe{
+    color: rgb(43, 87, 0);
+    font-size: 2rem;
+}
+.nav-link{
+    color: #222222 !important;
+}
+.f-info-links a{
+    text-decoration: none;
+    color: #222222;
+}
+.f-info-links a :hover{
+    text-decoration: underline;
+   
+}
+ 
+.f-info-socials,.f-info-links , .f-info-brand{
+    width: 100%;
+     display: flex;
+    justify-content: center;
+    align-items: center;
+   
+}
+.f-info-socials i {
+    font-size: 1.3rem;
+    margin-right: 1rem;
+   
+}
+.f-info{
+    text-align: center;
+    height: 8rem;
+    background-color: #bebebe;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.card{
+    border: none !important;
+    margin-bottom: 2rem;
+    margin-right: 0% !important;
+     margin-left: 0% !important;
+}
+.card-img-top{
+    border-radius: 1rem !important;
+    width: 100% !important; 
+    object-fit: cover !important;
+}
+.card-body{
+    padding: 0 !important;
+}
+.card-text p{
+    text-align: center;
+    font-weight: 400;
+
+}
+.listing-link{
+    text-decoration: none;
+    color: #222222;
+}
+.card-img-overlay {
+    opacity: 0;
+}
+.card-img-overlay:hover{
+   opacity: 0.2;
+   background-color: white;
+}
+.btn-centre{
+   
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+.show-img{
+    height: 60vh;
+    width: 30vw;
+}
+.card-body{
+    text-align: center;
+    font-weight: 500;
+}
+.btn-class{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+
+}
+.btn-edit{
+    
+     display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+.btn-delete{
+     display: flex;
+    justify-content: center;
+    align-items: center;
+}
