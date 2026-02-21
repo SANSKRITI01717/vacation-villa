@@ -2,12 +2,14 @@ const express=require("express");
 const mongoose=require("mongoose");
 const app=express();
 const listing=require("./models/listing");
+const review=require("./models/review");
 const path=require("path");
 const ejsMate=require("ejs-mate");
 const wrapAsync=require("./utils/wrapAsync.js");
 const expressError=require("./utils/expressError.js");
 const Joi = require('joi');
-const {listSchema}=require("./schema.js");
+const {listSchema,reviewSchema}=require("./schema.js");
+
 app.engine('ejs', ejsMate);
 app.listen(3000,()=>{
     console.log("i am working!");
@@ -20,6 +22,7 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname,"public")));
 const methodoverride=require("method-override");
+
 app.use(methodoverride("_method"));
 async function main() {
   await mongoose.connect('mongodb://127.0.0.1:27017/dermo');
@@ -32,6 +35,17 @@ main().catch((err)=>{
 //----------------------------------------------error validation
 const validatelisting=(req,res,next)=>{
      const { error } = listSchema.validate(req.body);
+
+  if (error) {
+    const msg = error.details.map(el => el.message).join(",");
+    throw new expressError(400, msg);
+  }else{
+    next();
+  }
+}
+//----------------------------------------------------review validation
+const validatereview=(req,res,next)=>{
+     const { error } = reviewSchema.validate(req.body);
 
   if (error) {
     const msg = error.details.map(el => el.message).join(",");
@@ -69,7 +83,7 @@ app.get("/listing/new",(req,res)=>{
 //------------------------------------show route
 app.get("/listing/:id",wrapAsync(async(req,res)=>{
    let {id}=req.params;
-   const ALLlisting= await listing.findById(id);
+   const ALLlisting= await listing.findById(id).populate("review");
    console.log(ALLlisting);
    res.render("./listing/show.ejs",{ALLlisting});
 }))
@@ -107,11 +121,35 @@ app.delete("/listing/:id",wrapAsync(async(req,res)=>{
  console.log(deletedlisting);
  res.redirect("/listing");
 }))
+
+//-------------------review route
+app.post("/listing/:id/reviews",validatereview, wrapAsync(async (req, res) => {
+
+    const listingDoc = await listing.findById(req.params.id);
+
+    const newreview = new review(req.body.review);
+
+    listingDoc.review.push(newreview);
+
+    await newreview.save();
+    await listingDoc.save();
+
+    console.log("review added");
+   console.log(req.body)
+    res.redirect(`/listing/${req.params.id}`);
+}));
+//-----------------------------delete review route
+app.delete("/listing/:id/reviews/:reviewId",wrapAsync(async(req,res)=>{
+  let {id,reviewId}=req.params;
+ 
+  await listing.findByIdAndUpdate(id,{$pull :{review :reviewId}});
+   await review.findByIdAndDelete(reviewId);
+  res.redirect(`/listing/${id}`);
+}))
 //------------------------------page not found
 app.use((req,res,next)=>{
   next(new expressError(404,"page not found"));
 })
-
 //-----------------------error middlebare
 app.use((err,req,res,next)=>{
   let {status=500,message="something went wrong!"}=err;
