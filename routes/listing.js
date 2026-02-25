@@ -1,9 +1,11 @@
 const express=require("express");
+const app=express();
 const router=express.Router();
 const {listSchema}=require("../schema.js");
 const wrapAsync=require("../utils/wrapAsync.js");
 const expressError=require("../utils/expressError.js");
 const listing=require("../models/listing");
+
 //----------------------------------------------error validation
 const validatelisting=(req,res,next)=>{
      const { error } = listSchema.validate(req.body);
@@ -30,6 +32,11 @@ router.get("/:id",wrapAsync(async(req,res)=>{
    let {id}=req.params;
    const ALLlisting= await listing.findById(id).populate("review");
    console.log(ALLlisting);
+   if(!ALLlisting){
+     req.flash("error","the listing you are trying to find does not exists");
+     res.redirect("/listing");
+     return;
+   }
    res.render("./listing/show.ejs",{ALLlisting});
 }))
 //--------------------------------------------add newlisting
@@ -38,6 +45,7 @@ router.post("/",  validatelisting ,wrapAsync(async (req, res,next) => {
 
   const newlisting = new listing(req.body.listing);
   await newlisting.save();
+  req.flash("success","new listing added!");
   res.redirect("/listing");
 }));
 
@@ -53,12 +61,15 @@ router.put("/:id", validatelisting,wrapAsync(async(req,res)=>{
   let {id}=req.params;
 
   await listing.findByIdAndUpdate(id,{...req.body.listing});
+    req.flash("success","listing updated!");
   res.redirect(`/listing/${id}`);
 }))
+//--------------------------------delete route
 router.delete("/:id",wrapAsync(async(req,res)=>{
   let {id}=req.params;
  let deletedlisting=await listing.findByIdAndDelete(id);
  console.log(deletedlisting);
+  req.flash("success","listing deleted!");
  res.redirect("/listing");
 }))
 module.exports=router;
