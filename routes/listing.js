@@ -1,22 +1,11 @@
 const express=require("express");
 const app=express();
 const router = express.Router();
-const {listSchema}=require("../schema.js");
 const wrapAsync=require("../utils/wrapAsync.js");
-const expressError=require("../utils/expressError.js");
 const listing=require("../models/listing");
+const {isloggedin,validatelisting,isOwner}=require("../middleware.js");
+const user = require("../models/user.js");
 
-//----------------------------------------------error validation
-const validatelisting=(req,res,next)=>{
-     const { error } = listSchema.validate(req.body);
-
-  if (error) {
-    const msg = error.details.map(el => el.message).join(",");
-    throw new expressError(400, msg);
-  }else{
-    next();
-  }
-}
 //-----------------------------------------Index route
 router.get("/",wrapAsync(async(req,res)=>{
  const listings = await listing.find({});
@@ -24,13 +13,15 @@ router.get("/",wrapAsync(async(req,res)=>{
  res.render("./listing/index.ejs",{listings});
 }))
 //----------------------------New route
-router.get("/new",(req,res)=>{
+router.get("/new",isloggedin,(req,res)=>{
+ 
   res.render("./listing/new.ejs");
 })
 //------------------------------------show route
 router.get("/:id",wrapAsync(async(req,res)=>{
    let {id}=req.params;
-   const ALLlisting= await listing.findById(id).populate("review");
+   const ALLlisting= await listing.findById(id).populate("review").populate("owner");
+   // We use.populate Here because. Populate. Like we have taken reference object ID from reviews and owner. So to see the all information of it. We use populate.
    console.log(ALLlisting);
    if(!ALLlisting){
      req.flash("error","the listing you are trying to find does not exists");
@@ -40,10 +31,11 @@ router.get("/:id",wrapAsync(async(req,res)=>{
    res.render("./listing/show.ejs",{ALLlisting});
 }))
 //--------------------------------------------add newlisting
-router.post("/",  validatelisting ,wrapAsync(async (req, res,next) => {
+router.post("/", isloggedin, validatelisting ,wrapAsync(async (req, res,next) => {
 
 
   const newlisting = new listing(req.body.listing);
+  newlisting.owner=req.user._id;
   await newlisting.save();
   req.flash("success","new listing added!");
   res.redirect("/listing");
@@ -51,21 +43,20 @@ router.post("/",  validatelisting ,wrapAsync(async (req, res,next) => {
 
 
 //-----------------------------------------update route
-router.get("/:id/edit", wrapAsync(async(req,res)=>{
+router.get("/:id/edit", isloggedin,isOwner,wrapAsync(async(req,res)=>{
     let {id}=req.params;
     const toupdate= await listing.findById(id);
     res.render("./listing/update.ejs",{toupdate});
 }))
-//--------------------updateroute
-router.put("/:id", validatelisting,wrapAsync(async(req,res)=>{
+//--------------------update route
+router.put("/:id", isloggedin,isOwner,validatelisting,wrapAsync(async(req,res)=>{
   let {id}=req.params;
-
   await listing.findByIdAndUpdate(id,{...req.body.listing});
     req.flash("success","listing updated!");
   res.redirect(`/listing/${id}`);
 }))
 //--------------------------------delete route
-router.delete("/:id",wrapAsync(async(req,res)=>{
+router.delete("/:id",isloggedin,isOwner,wrapAsync(async(req,res)=>{
   let {id}=req.params;
  let deletedlisting=await listing.findByIdAndDelete(id);
  console.log(deletedlisting);
