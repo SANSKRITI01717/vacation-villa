@@ -16,7 +16,7 @@
         <p class="card-text"><%= ALLlisting.country %></p>
    <div class="btn-class offset-2">
 
-
+<% if(currUser && ALLlisting.owner._id.equals(currUser._id)){ %>
 
     <div class="col-1 btn-edit">  
          <a href="/listing/<%= ALLlisting._id%>/edit" class="btn-centre btn btn-dark add-btn">Edit</a>
@@ -27,14 +27,16 @@
         </form>
     </div>
     
-
+<% } %>
 
 </div>  
     <hr>
+    
     <div class="review col-8 offset-2 mb-3 mt-3">
       <h1>
       Leave a Review
     </h1>
+    <% if(currUser){ %>
     <form action="/listing/<%= ALLlisting._id%>/reviews" method="post" novalidate class="needs-validation">
       <div class="mb-3 mt-3">
         <label for="rating" class="form-lable">Rating</label>
@@ -50,8 +52,10 @@
       <button class="btn btn-outline-dark">Submit</button>
 
     </form>
-
+    
+<% } %>
   </div>
+  
   <HR></HR>
 
  <p> <b>View Reviews</b></p>
@@ -59,7 +63,7 @@
   <% for(review of ALLlisting.review){ %> 
     <div class="card col-8 offset-2 ms-3 mb-3">
         <div class="card-body">
-           <h5 class="card-title">umi</h5>
+           <h5 class="card-title"><%= review.author.username %></h5>
             <p class="card-text"><%= review.comment %></p>
             <p class="card-text"><%= review.rating%> stars</p>
 

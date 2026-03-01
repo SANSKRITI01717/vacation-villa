@@ -20,7 +20,7 @@ router.get("/new",isloggedin,(req,res)=>{
 //------------------------------------show route
 router.get("/:id",wrapAsync(async(req,res)=>{
    let {id}=req.params;
-   const ALLlisting= await listing.findById(id).populate("review").populate("owner");
+   const ALLlisting= await listing.findById(id).populate({path:"review",populate:{path:"author"},}).populate("owner");
    // We use.populate Here because. Populate. Like we have taken reference object ID from reviews and owner. So to see the all information of it. We use populate.
    console.log(ALLlisting);
    if(!ALLlisting){
