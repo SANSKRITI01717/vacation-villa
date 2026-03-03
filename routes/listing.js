@@ -7,20 +7,27 @@ const {isloggedin,validatelisting,isOwner}=require("../middleware.js");
 const user = require("../models/user.js");
 const listingcontroller=require("../controllers/listings.js");
 const { render } = require("ejs");
+const multer  = require('multer')
+const {storage}=require("../cloudconfig.js");
+const upload = multer({storage });
 //-----------------------------------------Index route
-router.get("/",wrapAsync(listingcontroller.index));
+router.route("/")
+.get(wrapAsync(listingcontroller.index))
+.post( isloggedin,
+ 
+     upload.single('listing[image]'),
+         validatelisting ,
+     wrapAsync(listingcontroller.createnewlisting));
+
 //----------------------------New route
 router.get("/new",isloggedin,listingcontroller.rendernewform);
 //------------------------------------show route
-router.get("/:id",wrapAsync(listingcontroller.shownewlisting));
-//--------------------------------------------add newlisting
-router.post("/", isloggedin, validatelisting ,wrapAsync(listingcontroller.createnewlisting));
+router.route("/:id")
+.get(wrapAsync(listingcontroller.shownewlisting))
+.put( isloggedin,isOwner,validatelisting,wrapAsync(listingcontroller.updatelistingform))
+.delete(isloggedin,isOwner,wrapAsync(listingcontroller.deletelisting));
 
 
 //-----------------------------------------update route
 router.get("/:id/edit", isloggedin,isOwner,wrapAsync(listingcontroller.updatelisting));
-//--------------------update route
-router.put("/:id", isloggedin,isOwner,validatelisting,wrapAsync(listingcontroller.updatelistingform));
-//--------------------------------delete route
-router.delete("/:id",isloggedin,isOwner,wrapAsync(listingcontroller.deletelisting));
 module.exports=router;

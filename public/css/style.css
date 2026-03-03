@@ -51,6 +51,8 @@ body{
 .f-info{
     text-align: center;
     height: 8rem;
+    width: 100vw;         
+    margin-left: calc(-50vw + 50%);
     background-color: #bebebe;
     display: flex;
     flex-wrap: wrap;

@@ -1,6 +1,12 @@
+if(process.env.NODE_ENV!="production"){
+ require('dotenv').config();
+}
+
+
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
+
 const path = require("path");
 const ejsMate = require("ejs-mate");
 const expressError = require("./utils/expressError.js");
