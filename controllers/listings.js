@@ -37,11 +37,20 @@ module.exports.createnewlisting=async (req, res,next) => {
 module.exports.updatelisting=async(req,res)=>{
     let {id}=req.params;
     const toupdate= await listing.findById(id);
-    res.render("./listing/update.ejs",{toupdate});
+    let orginalimageurl=toupdate.image.url;
+    orginalimageurl.replace('/upload','/upload/h_300,w_250');
+    res.render("./listing/update.ejs",{toupdate,orginalimageurl});
 }
 module.exports.updatelistingform=async(req,res)=>{
   let {id}=req.params;
-  await listing.findByIdAndUpdate(id,{...req.body.listing});
+  let Listing=await listing.findByIdAndUpdate(id,{...req.body.listing});
+  if(req.filename){
+    let url=req.file.path;
+   let filename=req.file.filename;
+   Listing.image={url,filename};
+   await Listing.save();
+  }
+   
     req.flash("success","listing updated!");
   res.redirect(`/listing/${id}`);
 }

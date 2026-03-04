@@ -7,7 +7,7 @@
 
         <div class="col-8 offset-2">
     <h2>UPDATE THE LISTING </h2>
-    <form action="/listing/<%= toupdate._id %>?_method=PUT" method="post" novalidate class="needs-validation">
+    <form action="/listing/<%= toupdate._id %>?_method=PUT" method="post" novalidate class="needs-validation" enctype="multipart/form-data">
         <div class="mb-3">
               <label for="title" class="form-lable">Title</label>
         <input type="text" name="listing[title]" id="" class="form-control" value="<%= toupdate.title %>" required>
@@ -30,16 +30,15 @@
                     </div>
         </div>
         <br><br>
+        <div class="mb-3">
+            <h4> Original image </h4>
+        <img src=<%= orginalimageurl %> alt="">
+       </div>
+       <br><br>
             <div class="mb-3">
-          <label for="image" class="form-lable">Image URL</label>
-        <input type="text" name="listing[image]"  class="form-control" required value="<%= toupdate.image %>">
-         <div class="invalid-feedback">
-                        Please provide a valid image url.
-                    </div>
-                    <div class="valid-feedback">
-                        Looks good!
-                    </div>
-        </div>
+          <label for="image" class="form-lable">uplode new image</label>
+        <input type="file" name="listing[image]"  class="form-control"  >
+       </div>
         <br><br>
             <div class="mb-3">
                  <label for="price" class="form-lable">Price</label>

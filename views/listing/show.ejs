@@ -25,6 +25,8 @@
             <p class="card-text">
               <%= ALLlisting.country %>
             </p>
+            <h2>where you'll be</h2>
+            <div id="map" style="height: 350px; width: 100%; border-radius: 1rem;"></div>
             <div class="btn-class offset-2">
 
               <% if(currUser && ALLlisting.owner._id.equals(currUser._id)){ %>
@@ -117,4 +119,26 @@
         </div>
       </div>
     </div>
+    <script>
+    const mapLocation = "<%= ALLlisting.location %>, <%= ALLlisting.country %>";
+
+    fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(mapLocation)}&format=json`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.length > 0) {
+                const lat = data[0].lat;
+                const lon = data[0].lon;
+
+                const map = L.map('map').setView([lat, lon], 13);
+                
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                L.marker([lat, lon]).addTo(map)
+                    .bindPopup("<b><%= ALLlisting.title %></b><br><%= ALLlisting.location %>")
+                    .openPopup();
+            }
+        });
+</script>
   </body>
